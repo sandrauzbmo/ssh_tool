@@ -31,11 +31,23 @@ sha256sum -c SHA256SUMS
 ./agentssh --server https://console.example/agentssh/
 ```
 
-ARM64 克隆用户执行 `./bin/agentssh-linux-arm64 --server https://console.example/agentssh/`。使用 `uname -m` 确认架构。上面的命令从本仓库下载 `v0.2.0` 客户端编译文件。SHA-256 见 [SHA256SUMS](SHA256SUMS) 和 [deployment/RELEASE.json](deployment/RELEASE.json)。克隆仓库后可一次校验两个架构文件。
+ARM64 克隆用户执行 `./bin/agentssh-linux-arm64 --server https://console.example/agentssh/`。使用 `uname -m` 确认架构。上面的命令从本仓库下载 `v0.2.1` 客户端编译文件。SHA-256 见 [SHA256SUMS](SHA256SUMS) 和 [deployment/RELEASE.json](deployment/RELEASE.json)。克隆仓库后可一次校验两个架构文件。
 
 **把示例地址替换为你自己的控制台 HTTPS 地址，并保留实际部署路径。** 每次运行都必须传入 `--server`；程序不会使用内置地址，也不携带某个部署的注册信息。客户端会从选定控制台获取授权设置、生成本机身份并自动注册。控制台需要提供兼容的自动注册入口；未开放时，请联系该控制台管理员。无需在目标机器安装 Go、Node、Python 或额外动态库。
 
 默认前台运行，Ctrl+C 正常退出。保持终端进程运行时，设备才会保持连接；断网后自动退避重连。进入控制台的设备列表查看设备，在线状态和本机 SSH 是否可达分别显示。v0.2.0 使用 15～20 秒心跳和双向 WebSocket 保活；每次成功连接后重置退避，连续失败的重试间隔最多 15 秒。更新时保留原状态目录即可沿用设备身份。
+
+## 云端账户注册标记
+
+云端任务可为每个沙箱指定首次注册名称及对应的控制台账户 ID：
+
+```bash
+./agentssh --server https://console.example/agentssh/ --name wb-account-sandbox --cookie-account-id YOUR_CONSOLE_ACCOUNT_ID
+```
+
+`--cookie-account-id` 是非敏感的账户引用，不是 Cookie 值；名称及 ID 随原有注册请求发送，不额外建立连接。它们保存在本机状态中，重启保持。只有首次注册会采用 `--name` 作为设备名称，已有设备名称由控制台管理。
+
+名称标记用于定位账户。控制台会核验该沙箱的一次性签名绑定后，通过同一次 SSH 任务会话写入受限凭据文件并执行脚本；仅提供名称或账户 ID 不会获得 Cookie。缺少有效绑定时停止，不逐个账户试探。此流程需要兼容的私有控制台；已有设备重连不会补发自动任务。
 
 ## 从控制台进入容器 SSH
 

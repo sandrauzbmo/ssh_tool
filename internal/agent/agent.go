@@ -20,10 +20,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/coder/websocket"
 	"github.com/sandrauzbmo/ssh_tool/internal/pack"
 	"github.com/sandrauzbmo/ssh_tool/internal/protocol"
 	"github.com/sandrauzbmo/ssh_tool/internal/secure"
-	"github.com/coder/websocket"
 )
 
 type APIError struct {
@@ -49,6 +49,14 @@ type Agent struct {
 }
 
 func ValidateConfig(c pack.Config) error {
+	if len(c.RegistrationName) > 128 || strings.ContainsAny(c.RegistrationName, "\r\n\x00") || len(c.CookieAccountID) > 64 {
+		return errors.New("注册名称或账户标记无效")
+	}
+	for _, r := range c.CookieAccountID {
+		if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '_' || r == '-') {
+			return errors.New("账户标记必须是控制台账户ID")
+		}
+	}
 	_, e := protocol.NormalizeServer(c.Server)
 	if e != nil || c.Protocol != protocol.Version {
 		return errors.New("需要有效HTTPS地址和支持的协议")
@@ -176,6 +184,9 @@ func (a *Agent) Run(ctx context.Context) error {
 	}
 	defer a.HTTP.CloseIdleConnections()
 	delay := time.Duration(rand.Int64N(int64(2 * time.Second)))
+	if a.Config.CookieAccountID != "" {
+		delay = time.Duration(rand.Int64N(int64(250 * time.Millisecond)))
+	}
 	select {
 	case <-ctx.Done():
 		return nil
@@ -417,7 +428,7 @@ func (a *Agent) Metadata() protocol.Metadata {
 	}
 
 	host, _ := os.Hostname()
-	m := protocol.Metadata{Hostname: host, OS: runtime.GOOS, Arch: runtime.GOARCH, CPUs: runtime.NumCPU(), Version: protocol.BuildVersion, IPs: []string{}}
+	m := protocol.Metadata{RegistrationName: a.Config.RegistrationName, CookieAccountID: a.Config.CookieAccountID, Hostname: host, OS: runtime.GOOS, Arch: runtime.GOARCH, CPUs: runtime.NumCPU(), Version: protocol.BuildVersion, IPs: []string{}}
 	addrs, _ := net.InterfaceAddrs()
 	for _, a := range addrs {
 		ip, _, e := net.ParseCIDR(a.String())

@@ -1,13 +1,13 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "protocol": 1,
   "files": {
     "agentssh": {
-      "sha256": "4060392c8640b73b48714e75464273793c321b24e905d8f66599ece1d8dc8c8c",
-      "size": 7663776
+      "sha256": "fd0b32c98aadf91dabf25416ed691f47fad890b3999f5b1401d84e7769b77876",
+      "size": 7667872
     },
     "bin/agentssh-linux-arm64": {
-      "sha256": "a9de3cb1a63e3ed9e9ab00afd7754d062b6af90dc1c8c60d2e2d28c9961ad243",
+      "sha256": "43df0712b00bc4a4050160fd704e4188e6eb504b6dd37ce37752d9b8d9345c84",
       "size": 7078048
     }
   },

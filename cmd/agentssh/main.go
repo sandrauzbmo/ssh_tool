@@ -42,6 +42,8 @@ func runArgs(args []string) error {
 	state := flags.String("state-dir", agent.DefaultState(), "本机私有状态目录")
 	server := flags.String("server", "", "必填：控制台HTTPS地址，包含部署路径")
 	caFile := flags.String("ca-file", "", "可选：本机可信CA证书文件")
+	registrationName := flags.String("name", "", "可选：首次注册的设备名称")
+	cookieAccountID := flags.String("cookie-account-id", "", "可选：控制台云端账户ID标记，不是Cookie值")
 	target := flags.String("ssh-target", "127.0.0.1:22", "本机回环SSH地址")
 	confirm := flags.Bool("confirm", false, "确认显式身份重置")
 	purge := flags.Bool("purge-identity", false, "卸载时删除本项目身份")
@@ -161,6 +163,12 @@ func runArgs(args []string) error {
 	c, e := configuration(*state, *server, *caFile)
 	if e != nil {
 		return e
+	}
+	if *registrationName != "" {
+		c.RegistrationName = *registrationName
+	}
+	if *cookieAccountID != "" {
+		c.CookieAccountID = *cookieAccountID
 	}
 	a, e := agent.New(c, *state, *target)
 	if e != nil {

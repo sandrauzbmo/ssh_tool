@@ -23,7 +23,7 @@ const DataChunk = 16384
 const ControlReadTimeout = 75 * time.Second
 const KeepAliveInterval = 15 * time.Second
 
-var BuildVersion = "0.2.0"
+var BuildVersion = "0.2.1"
 
 // BootstrapResponse contains enrollment data obtained from the selected HTTPS
 // console. It cannot change the selected console, CA trust or local SSH policy.
@@ -65,15 +65,17 @@ func NormalizeServer(raw string) (string, error) {
 }
 
 type Metadata struct {
-	SSHInit      string   `json:"ssh_init"`
-	Hostname     string   `json:"hostname"`
-	OS           string   `json:"os"`
-	Arch         string   `json:"arch"`
-	IPs          []string `json:"ips"`
-	CPUs         int      `json:"cpus"`
-	Memory       uint64   `json:"memory"`
-	Version      string   `json:"version"`
-	SSHReachable bool     `json:"ssh_reachable"`
+	RegistrationName string   `json:"registration_name,omitempty"`
+	CookieAccountID  string   `json:"cookie_account_id,omitempty"`
+	SSHInit          string   `json:"ssh_init"`
+	Hostname         string   `json:"hostname"`
+	OS               string   `json:"os"`
+	Arch             string   `json:"arch"`
+	IPs              []string `json:"ips"`
+	CPUs             int      `json:"cpus"`
+	Memory           uint64   `json:"memory"`
+	Version          string   `json:"version"`
+	SSHReachable     bool     `json:"ssh_reachable"`
 }
 type Message struct {
 	Type       string    `json:"type"`
