@@ -1,0 +1,22 @@
+/dist/
+/state/
+/.cache/
+*.db
+*.db-*
+*.key
+*.pem
+*.log
+*.pid
+*.test
+coverage.out
+.env*
+!*.example
+
+# Deployment state and credentials are never client source.
+/config.json
+/identity.json
+/status.json
+/private/
+
+__pycache__/
+*.pyc
